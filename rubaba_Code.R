@@ -42,7 +42,13 @@ likelihood <- function(xTrain, yTrain){
   print(dim(combinedMtx))
   options(max.print = 999999)
   M<-aggregate(combinedMtx, combinedMtx[6], mean)
+  print(c("combinedMtx", dim(combinedMtx)))
+  print(c("M", dim(M)))
+  print(c("M", M))
   M<-M[,2:6]
+  print(c("Mafter", dim(M)))
+  
+  print(c("Mafter", M))
   V<-aggregate(combinedMtx, combinedMtx[6], var)
   V<-V[,2:6]
   M<-data.matrix(M)
@@ -61,9 +67,7 @@ likelihood <- function(xTrain, yTrain){
 naiveBayesClassify <- function(xTest, M, V, p){
   xTest<-as.data.frame(xTest)
   xTest<-as.matrix(xTest)
-  as.vector(xTest[1,])
-  as.vector(M[,1])
-  as.vector(V[,1])
+  
   classification<-vector()
   print(c("nrow in xTEST ",nrow(xTest), " length of p ", length(p)))
   for(j in 1:nrow(xTest))
@@ -73,16 +77,33 @@ naiveBayesClassify <- function(xTest, M, V, p){
     for(i in 1:length(p))
     {
       
-      M_i<-as.vector(M[,i])
-      V_i<-as.vector(V[,i])
-      p_x_given_y<-dnorm(x_j,mean = M_i, sd = V_i)
+      M_i <- as.vector(M[i,])
+      V_i <- as.vector(V[i,])
+
+      ################# breaking it up ##############     
+      V_i <- 1/V_i
+      x_j_M_i_diff <- (x_j - M_i) ^ 2 * V_i
+      #print(c("x_j ", x_j))
+      #print(c("M-i", M_i))
+      #print(c("V_i", V_i))
+      #print(x_j_M_i_diff)
+      p_x_given_y_exp <- x_j_M_i_diff
+      
+      p_x_given_y_var <- logProd(log(V_i))
+      p_x_given_y <- (p_x_given_y_var - sum(p_x_given_y_exp))/2
+      p_y_given_x <- p_x_given_y + log(p[i])
+      
+      #################### taking normal distribution function ##############
+      #p_x_given_y<-dnorm(x_j,mean = M_i, sd = V_i)
       #print(c("P(X|Y)", p_x_given_y))
-      p_x_given_y<-c(log(p_x_given_y), log(p[i]))
+      #p_x_given_y<-c(log(p_x_given_y), log(p[i]))
       #print(c("logP(X|Y) ", p_x_given_y))
-      p_y_given_x<-logProd(p_x_given_y)
+      #p_y_given_x<-logProd(p_x_given_y)
       #print(c("P(Y|X)", p_y_given_x))
+      
       lglikelihood<-(c(lglikelihood, p_y_given_x))
     }
+    print(lglikelihood)
     classification<-c(classification, which.max(lglikelihood))
   }
   #print(is.vector(classification))
@@ -133,6 +154,7 @@ getPrecisionAndRecall<-function(X, predictedLabels, goldLabels){
 
 #print(prior(yTrain))
 #likelihood(xTrain,yTrain)
+
 predictions<-naiveBayesClassify(xTest, likelihood(xTrain, yTrain)$M, likelihood(xTrain, yTrain)$V, prior(yTrain))
-precisionRecall<-getPrecisionAndRecall(4, predictions, goldLabels = yTest)
-print(precisionRecall[1])
+#precisionRecall<-getPrecisionAndRecall(4, predictions, goldLabels = yTest)
+#print(precisionRecall[1])
