@@ -126,7 +126,6 @@ logisticRegressionClassify <- function(xTest, w){
 }
 
 getPrecisionAndRecall<-function(X, predictedLabels, goldLabels){
-  
   predictedTable=table(predictedLabels)
   
   goldTable=table(goldLabels)
@@ -137,7 +136,13 @@ getPrecisionAndRecall<-function(X, predictedLabels, goldLabels){
   totalGoldX=goldTable[X]
   
   TP_X=0
+  correctPredictionCount=0;
   for(i in 1:length(predictedLabels)){
+    
+    if(predictedLabels[i]==goldLabels[i]){
+      correctPredictionCount=correctPredictionCount+1;
+    }
+    
     if(predictedLabels[i]==X){
       if(goldLabels[i]==X){
         TP_X=TP_X+1;
@@ -148,13 +153,20 @@ getPrecisionAndRecall<-function(X, predictedLabels, goldLabels){
   
   precision=TP_X/totalPredictedX;
   recall=TP_X/totalGoldX;
-  
-  return(c(precision,recall) )
+  correctPredictionCount=correctPredictionCount/length(predictedLabels)
+  print('before return')
+  return(c(precision,recall,correctPredictionCount) )
 }
 
 #print(prior(yTrain))
 #likelihood(xTrain,yTrain)
 
 predictions<-naiveBayesClassify(xTest, likelihood(xTrain, yTrain)$M, likelihood(xTrain, yTrain)$V, prior(yTrain))
-#precisionRecall<-getPrecisionAndRecall(4, predictions, goldLabels = yTest)
-#print(precisionRecall[1])
+
+
+yTest <- as.data.frame(yTest)
+yTest <- as.vector(yTest[[1]])
+is.vector(yTest)
+is.vector(predictions)
+precisionRecall<-getPrecisionAndRecall(2, predictions, goldLabels = yTest)
+print(c(precisionRecall[1], "  ", precisionRecall[2], "  ", precisionRecall[3]))
