@@ -11,20 +11,6 @@ yTrain=read.csv("ecoli_new.yTrain.csv",  header = FALSE)
 xTest=read.csv("ecoli_new.xTest.csv",  header = FALSE)
 yTest=read.csv("ecoli_new.yTest.csv",  header = FALSE)
 
-getInitialWeight <- function(xTrain){
-  dims = dim(xTrain)
-  nRow = dims[1]
-  nCol = dims[2]
-  
-  #### random initialization
-  #hundredths <- seq(from=0, to=1, by=.01)
-  #w = sample(hundredths, size=nCol, replace=TRUE)
-  ## or ## w <- round(runif(100, 0.0, 1.0), digits=2)
-
-  #initialize by zero
-  w = (rep( 0 , nCol ))
-  w
-}
 
 #### Part 3 ####
 sigmoidProb <- function(y, x, w){
@@ -54,8 +40,6 @@ logisticRegressionWeights <- function(xTrain, yTrain, w0, nIter){
   x = xTrain
   #x = as.numeric(xTrain[1:nRow, 1:nCol])
   #y = as.numeric(yTrain[1:nRow])
-
-  print("HO")
 
   dims = dim(xTrain)
   nRow = dims[1]
@@ -100,6 +84,34 @@ logisticRegressionWeights <- function(xTrain, yTrain, w0, nIter){
 
 logisticRegressionClassify <- function(xTest, w){
   threshold = 0.5
+  yPred = 0
+  cond_prob_of_y_being_one = sigmoidProb(1, xTest, w) 
+  if ((cond_prob_of_y_being_one) > threshold){
+    yPred = 1
+  }
+  yPred
+}
+
+
+
+#### Part 3 Helper Functions ####
+getInitialWeight <- function(xTrain){
+  dims = dim(xTrain)
+  nRow = dims[1]
+  nCol = dims[2]
+  
+  #### random initialization
+  #hundredths <- seq(from=0, to=1, by=.01)
+  #w = sample(hundredths, size=nCol, replace=TRUE)
+  ## or ## w <- round(runif(100, 0.0, 1.0), digits=2)
+  
+  #initialize by zero
+  w = (rep( 0 , nCol ))
+  w
+}
+
+logisticRegressionClassifyBatch <- function(xTest, w){
+  threshold = 0.5
   dims = dim(xTest)
   nRow = dims[1]
   yPred = (rep( 0 , nRow ))
@@ -114,15 +126,13 @@ logisticRegressionClassify <- function(xTest, w){
 }
 
 w = getInitialWeight(xTrain)
-print(w)
 learned_w = logisticRegressionWeights(xTrain, yTrain, w, 100)
-print(learned_w)
-yPred = logisticRegressionClassify(xTest, learned_w)
-#print(yPred)
-#print(yTest)
+yPred = logisticRegressionClassifyBatch(xTest, learned_w)
 print(sum(yPred != yTest))
 cat(sprintf("Accuracy %f\n", 100*sum(yPred == yTest)/(dim(yTest))[1]))
-#Test for sigmoidProb
+
+
+### Test for sigmoidProb
 #xx =  (as.numeric(xTrain[1, ]))
 #print(sigmoidProb(0,xx, w))
 
