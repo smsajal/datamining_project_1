@@ -72,7 +72,13 @@ getPrecisionAndRecall<-function(X, predictedLabels, goldLabels){
     totalGoldX=goldTable[X]
     
     TP_X=0
+    correctPredictionCount=0;
     for(i in 1:length(predictedLabels)){
+        
+        if(predictedLabels[i]==goldLabels[i]){
+            correctPredictionCount=correctPredictionCount+1;
+        }
+        
         if(predictedLabels[i]==X){
             if(goldLabels[i]==X){
                 TP_X=TP_X+1;
@@ -83,8 +89,9 @@ getPrecisionAndRecall<-function(X, predictedLabels, goldLabels){
     
     precision=TP_X/totalPredictedX;
     recall=TP_X/totalGoldX;
+    correctPredictionCount=correctPredictionCount/length(predictedLabels)
     
-    return(c(precision,recall) )
+    return(c(precision,recall,correctPredictionCount) )
     
     
     
@@ -100,3 +107,4 @@ prediction=c(1,2,2,1,1,3,3,2,3,1,2,2,1,3,1,3,2,1,1,3,2,2,2,3)
 prec_rec=getPrecisionAndRecall(3,predictedLabels = prediction,goldLabels = gold)
 print(prec_rec[1])
 print(prec_rec[2])
+print(prec_rec[3])
