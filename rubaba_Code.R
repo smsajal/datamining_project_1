@@ -13,6 +13,12 @@ yTest=read.csv("/Users/rxh655/Documents/Spring2019/STAT557/project1/project1Code
 
 #### Part 1 ####
 logProd <- function(x){
+  logProduct=0
+  for(i in 1:length(x)){
+    logProduct=logProduct+x[i]
+  }
+  
+  return(logProduct)
   
 }
 
@@ -70,16 +76,19 @@ naiveBayesClassify <- function(xTest, M, V, p){
       M_i<-as.vector(M[,i])
       V_i<-as.vector(V[,i])
       p_x_given_y<-dnorm(x_j,mean = M_i, sd = V_i)
-      print(c("P(X|Y)", p_x_given_y))
+      #print(c("P(X|Y)", p_x_given_y))
       p_x_given_y<-c(log(p_x_given_y), log(p[i]))
+      #print(c("logP(X|Y) ", p_x_given_y))
       p_y_given_x<-logProd(p_x_given_y)
-      print(c("P(Y|X)", p_y_given_x))
+      #print(c("P(Y|X)", p_y_given_x))
       lglikelihood<-(c(lglikelihood, p_y_given_x))
     }
-    classification<-c(classification, which.min(lglikelihood))
+    classification<-c(classification, which.max(lglikelihood))
   }
-  print(is.vector(classification))
-  print(length(classification))
+  #print(is.vector(classification))
+  #print(length(classification))
+  print(classification)
+  return(classification)
 }
 
 #### Part 3 ####
@@ -95,6 +104,35 @@ logisticRegressionClassify <- function(xTest, w){
   
 }
 
+getPrecisionAndRecall<-function(X, predictedLabels, goldLabels){
+  
+  predictedTable=table(predictedLabels)
+  
+  goldTable=table(goldLabels)
+  
+  print(predictedTable)
+  print(goldTable)
+  totalPredictedX=predictedTable[X]
+  totalGoldX=goldTable[X]
+  
+  TP_X=0
+  for(i in 1:length(predictedLabels)){
+    if(predictedLabels[i]==X){
+      if(goldLabels[i]==X){
+        TP_X=TP_X+1;
+        
+      }
+    }
+  }
+  
+  precision=TP_X/totalPredictedX;
+  recall=TP_X/totalGoldX;
+  
+  return(c(precision,recall) )
+}
+
 #print(prior(yTrain))
 #likelihood(xTrain,yTrain)
-naiveBayesClassify(xTest, likelihood(xTrain, yTrain)$M, likelihood(xTrain, yTrain)$V, prior(yTrain))
+predictions<-naiveBayesClassify(xTest, likelihood(xTrain, yTrain)$M, likelihood(xTrain, yTrain)$V, prior(yTrain))
+precisionRecall<-getPrecisionAndRecall(4, predictions, goldLabels = yTest)
+print(precisionRecall[1])
