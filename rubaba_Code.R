@@ -1,0 +1,100 @@
+##################################
+###### STAT 557 (Project 1) ######
+##################################
+
+rm(list=ls()) ## To clear your environment
+
+## Read the data
+xTrain=read.csv("/Users/rxh655/Documents/Spring2019/STAT557/project1/project1Code/datamining_project_1/ecoli_xTrain.csv")
+yTrain=read.csv("/Users/rxh655/Documents/Spring2019/STAT557/project1/project1Code/datamining_project_1/ecoli_yTrain.csv")
+xTest=read.csv("/Users/rxh655/Documents/Spring2019/STAT557/project1/project1Code/datamining_project_1/ecoli_xTest.csv")
+yTest=read.csv("/Users/rxh655/Documents/Spring2019/STAT557/project1/project1Code/datamining_project_1/ecoli_yTest.csv")
+
+
+#### Part 1 ####
+logProd <- function(x){
+  
+}
+
+logSum <- function(x){
+  
+}
+
+#### Part 2 ####
+prior <- function(yTrain){
+  #print(yTrain)
+  freq<-as.data.frame(table(yTrain))
+  v<-freq[[2]]
+  sumF<- sum(v)
+  vec<-v/sumF
+  
+  return(vec)
+}
+
+likelihood <- function(xTrain, yTrain){
+  combinedMtx<- as.data.frame(cbind(xTrain,yTrain))
+  print(dim(combinedMtx))
+  options(max.print = 999999)
+  M<-aggregate(combinedMtx, combinedMtx[6], mean)
+  M<-M[,2:6]
+  V<-aggregate(combinedMtx, combinedMtx[6], var)
+  V<-V[,2:6]
+  M<-data.matrix(M)
+  V<-data.matrix(V)
+  #print(dim(M))
+  #print(M)
+  #print(combinedMtx)
+  #print(groupBy(combinedMtx, combinedMtx[,6], mean))
+  retList<- list("M" = M, "V" = V)
+  #print("IS MATRIX")
+  #print(is.matrix(retList$M))
+  #print(retList)
+  return(retList)
+}
+
+naiveBayesClassify <- function(xTest, M, V, p){
+  xTest<-as.data.frame(xTest)
+  xTest<-as.matrix(xTest)
+  as.vector(xTest[1,])
+  as.vector(M[,1])
+  as.vector(V[,1])
+  classification<-vector()
+  print(c("nrow in xTEST ",nrow(xTest), " length of p ", length(p)))
+  for(j in 1:nrow(xTest))
+  {
+    lglikelihood<-vector()
+    x_j<-as.vector(xTest[j,])
+    for(i in 1:length(p))
+    {
+      
+      M_i<-as.vector(M[,i])
+      V_i<-as.vector(V[,i])
+      p_x_given_y<-dnorm(x_j,mean = M_i, sd = V_i)
+      print(c("P(X|Y)", p_x_given_y))
+      p_x_given_y<-c(log(p_x_given_y), log(p[i]))
+      p_y_given_x<-logProd(p_x_given_y)
+      print(c("P(Y|X)", p_y_given_x))
+      lglikelihood<-(c(lglikelihood, p_y_given_x))
+    }
+    classification<-c(classification, which.min(lglikelihood))
+  }
+  print(is.vector(classification))
+  print(length(classification))
+}
+
+#### Part 3 ####
+sigmoidProb <- function(y, x, w){
+  
+}
+
+logisticRegressionWeights <- function(xTrain, yTrain, w0, nIter){
+  
+}
+
+logisticRegressionClassify <- function(xTest, w){
+  
+}
+
+#print(prior(yTrain))
+#likelihood(xTrain,yTrain)
+naiveBayesClassify(xTest, likelihood(xTrain, yTrain)$M, likelihood(xTrain, yTrain)$V, prior(yTrain))
