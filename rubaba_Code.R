@@ -39,16 +39,11 @@ prior <- function(yTrain){
 
 likelihood <- function(xTrain, yTrain){
   combinedMtx<- as.data.frame(cbind(xTrain,yTrain))
-  print(dim(combinedMtx))
   options(max.print = 999999)
   M<-aggregate(combinedMtx, combinedMtx[6], mean)
-  print(c("combinedMtx", dim(combinedMtx)))
-  print(c("M", dim(M)))
-  print(c("M", M))
-  M<-M[,2:6]
-  print(c("Mafter", dim(M)))
   
-  print(c("Mafter", M))
+  M<-M[,2:6]
+  
   V<-aggregate(combinedMtx, combinedMtx[6], var)
   V<-V[,2:6]
   M<-data.matrix(M)
@@ -83,10 +78,6 @@ naiveBayesClassify <- function(xTest, M, V, p){
       ################# breaking it up ##############     
       V_i <- 1/V_i
       x_j_M_i_diff <- (x_j - M_i) ^ 2 * V_i
-      #print(c("x_j ", x_j))
-      #print(c("M-i", M_i))
-      #print(c("V_i", V_i))
-      #print(x_j_M_i_diff)
       p_x_given_y_exp <- x_j_M_i_diff
       
       p_x_given_y_var <- logProd(log(V_i))
@@ -96,14 +87,14 @@ naiveBayesClassify <- function(xTest, M, V, p){
       #################### taking normal distribution function ##############
       #p_x_given_y<-dnorm(x_j,mean = M_i, sd = V_i)
       #print(c("P(X|Y)", p_x_given_y))
-      #p_x_given_y<-c(log(p_x_given_y), log(p[i]))
+      ##p_x_given_y<-c(log(p_x_given_y), log(p[i]))
       #print(c("logP(X|Y) ", p_x_given_y))
       #p_y_given_x<-logProd(p_x_given_y)
       #print(c("P(Y|X)", p_y_given_x))
       
       lglikelihood<-(c(lglikelihood, p_y_given_x))
     }
-    print(lglikelihood)
+    #print(lglikelihood)
     classification<-c(classification, which.max(lglikelihood))
   }
   #print(is.vector(classification))
@@ -166,7 +157,7 @@ predictions<-naiveBayesClassify(xTest, likelihood(xTrain, yTrain)$M, likelihood(
 
 yTest <- as.data.frame(yTest)
 yTest <- as.vector(yTest[[1]])
-is.vector(yTest)
-is.vector(predictions)
+#is.vector(yTest)
+#is.vector(predictions)
 precisionRecall<-getPrecisionAndRecall(2, predictions, goldLabels = yTest)
 print(c(precisionRecall[1], "  ", precisionRecall[2], "  ", precisionRecall[3]))
