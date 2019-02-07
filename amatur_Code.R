@@ -4,7 +4,7 @@
 
 rm(list=ls()) ## To clear your environment
 ## Read the data
-setwd("/Users/Sherlock/Box\ Sync/PSU\ Spr19/STAT\ 557/project1/datamining_project_1")
+#setwd("/Users/Sherlock/Box\ Sync/PSU\ Spr19/STAT\ 557/project1/datamining_project_1")
 
 xTrain=read.csv("ecoli_new.xTrain.csv",  header = FALSE)
 yTrain=read.csv("ecoli_new.yTrain.csv",  header = FALSE)
@@ -38,44 +38,29 @@ logisticRegressionWeights <- function(xTrain, yTrain, w0, nIter){
   nRow = dims[1]
   nCol = dims[2]
   x = xTrain
-  #x = as.numeric(xTrain[1:nRow, 1:nCol])
-  #y = as.numeric(yTrain[1:nRow])
-
-  dims = dim(xTrain)
-  nRow = dims[1]
-  nCol = dims[2]
   
   for (j in 1:nIter) {
-    #indices = seq(1,nRow,by=1)
-    #delI = lapply(indices, function(i) as.numeric(x[i, ])*(yTrain[i,1] - sigmoidProb(yTrain[i,1],as.numeric(x[i, ]),w) ) )
-    #gradient = sum (delI)
-  
+
     gradient = (rep( 0 , nCol ))
     
     for (i in 1:nRow) {
-      #y2=lapply(xTrain, yTrain, function(x, y) (y - sigmoidProb(y,x[i, ],w)) )
-      
       x2 = as.numeric(x[i, ]) # one example at a time
-      
-      #print(yTrain[i,1])
       y2 = yTrain[i,1] - sigmoidProb(1,x2,w) 
-      
       y2 = as.numeric(y2[,1])
-    
+      
       gradient = gradient + (x2 * y2) 
       
       
-      if(i==1 && j==1){
-        print(x2)
-        print(y2)
-        print(x2*y2)
-        print(gradient)
-      }
+      # if(i==1 && j==1){
+      #   print(x2)
+      #   print(y2)
+      #   print(x2*y2)
+      #   print(gradient)
+      # }
     }
     
     w = w + eta*gradient
-    print(w)
-    #print(w[1:20])
+    #print(w)
   }
   
   w
@@ -126,7 +111,7 @@ logisticRegressionClassifyBatch <- function(xTest, w){
 }
 
 w = getInitialWeight(xTrain)
-learned_w = logisticRegressionWeights(xTrain, yTrain, w, 100)
+learned_w = logisticRegressionWeights(xTrain, yTrain, w, 1000)
 yPred = logisticRegressionClassifyBatch(xTest, learned_w)
 print(sum(yPred != yTest))
 cat(sprintf("Accuracy %f\n", 100*sum(yPred == yTest)/(dim(yTest))[1]))
@@ -135,4 +120,3 @@ cat(sprintf("Accuracy %f\n", 100*sum(yPred == yTest)/(dim(yTest))[1]))
 ### Test for sigmoidProb
 #xx =  (as.numeric(xTrain[1, ]))
 #print(sigmoidProb(0,xx, w))
-
