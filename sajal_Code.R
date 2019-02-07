@@ -4,6 +4,10 @@
 
 rm(list=ls()) ## To clear your environment
 
+
+
+
+
 ## Read the data
 xTrain=read.csv("ecoli_xTrain.csv")
 yTrain=read.csv("ecoli_yTrain.csv")
@@ -29,7 +33,6 @@ logSum <- function(x){
     # logSummation=logSum(x,y=null,base=0);
     
     sortedX = sort(x, decreasing = TRUE)
-    print(sortedX)
     
     x_1 = x[1]
     
@@ -41,16 +44,19 @@ logSum <- function(x){
     }
     
     logTerm=1+logSecondTerm
-    print("ln(5) = ",log(5))
+
     logSummation=x_1+log(logTerm)
     
     return(logSummation)
 }
 
+###### Testing the functions...............
+# testingX=c(0,1.609437,1.386294,2.1972245,2.3978952)
+# productOfX=logProd(testingX)
+# print(productOfX)
+# 
+# sumOfX=logSum(testingX)
+# print(sumOfX)
 
-testingX=c(0,1.609437,1.386294,2.1972245,2.3978952)
-productOfX=logProd(testingX)
-print(productOfX)
 
-sumOfX=logSum(testingX)
-print(sumOfX)
+
