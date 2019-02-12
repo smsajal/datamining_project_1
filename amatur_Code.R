@@ -4,7 +4,7 @@
 
 rm(list=ls()) ## To clear your environment
 ## Read the data
-#setwd("/Users/Sherlock/Box\ Sync/PSU\ Spr19/STAT\ 557/project1/datamining_project_1")
+setwd("/Users/Sherlock/Box\ Sync/PSU\ Spr19/STAT\ 557/project1/datamining_project_1")
 
 xTrain=read.csv("ecoli_new.xTrain.csv",  header = FALSE)
 yTrain=read.csv("ecoli_new.yTrain.csv",  header = FALSE)
@@ -111,9 +111,26 @@ logisticRegressionClassifyBatch <- function(xTest, w){
 }
 
 w = getInitialWeight(xTrain)
-learned_w = logisticRegressionWeights(xTrain, yTrain, w, 1000)
+learned_w = logisticRegressionWeights(xTrain, yTrain, w, 100)
 yPred = logisticRegressionClassifyBatch(xTest, learned_w)
 print(sum(yPred != yTest))
+
+tn =  mapply (function(yp, yt) as.integer(yt==yp && yt==0), yPred, yTest, SIMPLIFY = TRUE)
+tp =  mapply (function(yp, yt) as.integer(yt==yp && yt==1), yPred, yTest, SIMPLIFY = TRUE)
+fn =  mapply (function(yp, yt) as.integer(yt!=yp && yt==1), yPred, yTest, SIMPLIFY = TRUE)
+fp =  mapply (function(yp, yt) as.integer(yt!=yp && yt==0), yPred, yTest, SIMPLIFY = TRUE)
+fn = ( sum(fn)) 
+fp = ( sum(fp)) 
+tp = ( sum(tp)) 
+tn = ( sum(tn)) 
+# 
+# fp = (sum(yPred == yTest))
+# tp = (sum(yPred == 1 && yTest == 1))
+# tn = (sum(yPred == 0 && yTest == 0))
+# fn = (sum(yPred == 1 && yTest == 0))
+# precision = tp / (tp + fp )
+print(fn+fp+tp+tn)
+
 cat(sprintf("Accuracy %f\n", 100*sum(yPred == yTest)/(dim(yTest))[1]))
 
 
