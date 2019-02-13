@@ -15,4 +15,4 @@ Question 3:
 Naive Bayes: Accuracy: 97.25%
 Logistic Regression: Accuracy: 95.41%
 
-The logistic regression was run with 100 iterations and step size 0.1. An example was categorized as class 1, if its probability of being 1 given the data crossed the threshold 0.5. Naive Bayes outperforms Logistic Regression (in terms of accuracy, recall and precision). It also outputs the solution faster.
+The logistic regression was run with 100 iterations and step size 0.1. An example was categorized as class 1, if its probability of being 1 given the data crossed the threshold 0.5. Naive Bayes outperforms Logistic Regression (both in terms of accuracy and precision). It also outputs the solution faster.

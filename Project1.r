@@ -2,6 +2,14 @@
 ###### STAT 557 (Project 1) ######
 ##################################
 
+###### Group Members (Total = 3) ######
+#######################################
+### Members:
+### Amatur Rahman
+### Rubaba Hasan
+### Sultan Mahmud Sajal
+#######################################
+
 rm(list=ls()) ## To clear your environment
 
 #setwd("/Users/Sherlock/Box\ Sync/PSU\ Spr19/STAT\ 557/project1/datamining_project_1")
