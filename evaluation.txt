@@ -1,0 +1,18 @@
+Report for Project 1
+Group Members:
+Amatur Rahman
+Rubaba Hasan
+Sultan Mahmud Sajal
+
+Question 2:
+Fraction of test samples classified correctly, i.e. accuracy = 83.5%
+For Class 1: Precision = 95.1%
+For Class 1: Recall = 97.5%
+For Class 5: Precision = 87.5%
+For Class 5: Recall = 77.8%
+
+Question 3:
+Naive Bayes: Accuracy: 97.25%
+Logistic Regression: Accuracy: 95.41%
+
+The logistic regression was run with 100 iterations and step size 0.1. An example was categorized as class 1, if its probability of being 1 given the data crossed the threshold 0.5. Naive Bayes outperforms Logistic Regression (in terms of accuracy, recall and precision). It also outputs the solution faster.
