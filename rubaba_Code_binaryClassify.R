@@ -5,7 +5,7 @@
 rm(list=ls()) ## To clear your environment
 
 ## Read the data
-setwd("/Users/Sherlock/Box\ Sync/PSU\ Spr19/STAT\ 557/project1/datamining_project_1")
+setwd("/Users/rxh655/Documents/Spring2019/STAT557/project1/project1Code/datamining_project_1")
 
 xTrain=read.csv("ecoli_new.xTrain.csv",  header = FALSE)
 yTrain=read.csv("ecoli_new.yTrain.csv",  header = FALSE)
@@ -96,6 +96,7 @@ naiveBayesClassify <- function(xTest, M, V, p){
         p_x_given_y_var <- logProd(log(V_i))
         p_x_given_y <- (p_x_given_y_var - sum(p_x_given_y_exp))/2
         p_y_given_x <- p_x_given_y + log(p[i])
+        print(p_y_given_x)
         
         #################### taking normal distribution function ##############
         #p_x_given_y<-dnorm(x_j,mean = M_i, sd = V_i)
@@ -106,11 +107,10 @@ naiveBayesClassify <- function(xTest, M, V, p){
         #print(c("P(Y|X)", p_y_given_x))
         
         lglikelihood<-(c(lglikelihood, p_y_given_x))
-     
       
       
     }
-
+    #print(c(lglikelihood))
     classification<-c(classification, which.max(lglikelihood))
     #print(which.max(lglikelihood))
   }
@@ -166,6 +166,7 @@ predictions = predictions - 1
 
 yTest = (as.vector(unlist(yTest)))
 yPred = as.vector(predictions)
+print(yPred)
 
 tn =  sum (mapply (function(yp, yt) as.integer(yt==yp && yt==0), yPred, yTest))
 tp =  sum (mapply (function(yp, yt) as.integer(yt==yp && yt==1), yPred, yTest))

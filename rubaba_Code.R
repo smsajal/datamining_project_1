@@ -4,32 +4,32 @@
 
 rm(list=ls()) ## To clear your environment
 
+setwd("/Users/rxh655/Documents/Spring2019/STAT557/project1/project1Code/datamining_project_1")
 ## Read the data
-xTrain_old=read.csv("/Users/rxh655/Documents/Spring2019/STAT557/project1/project1Code/datamining_project_1/ecoli_xTrain.csv", header=FALSE)
-yTrain_old=read.csv("/Users/rxh655/Documents/Spring2019/STAT557/project1/project1Code/datamining_project_1/ecoli_yTrain.csv", header=FALSE)
-xTest_old=read.csv("/Users/rxh655/Documents/Spring2019/STAT557/project1/project1Code/datamining_project_1/ecoli_xTest.csv", header=FALSE)
-yTest_old=read.csv("/Users/rxh655/Documents/Spring2019/STAT557/project1/project1Code/datamining_project_1/ecoli_yTest.csv", header=FALSE)
+xTrain_old=read.csv("ecoli_xTrain.csv", header=FALSE)
+yTrain_old=read.csv("ecoli_yTrain.csv", header=FALSE)
+xTest_old=read.csv("ecoli_xTest.csv", header=FALSE)
+yTest_old=read.csv("ecoli_yTest.csv", header=FALSE)
 
-xTrain_new=read.csv("/Users/rxh655/Documents/Spring2019/STAT557/project1/project1Code/datamining_project_1/ecoli_new.xTrain.csv",  header = FALSE)
-yTrain_new=read.csv("/Users/rxh655/Documents/Spring2019/STAT557/project1/project1Code/datamining_project_1/ecoli_new.yTrain.csv",  header = FALSE)
-xTest_new=read.csv("/Users/rxh655/Documents/Spring2019/STAT557/project1/project1Code/datamining_project_1/ecoli_new.xTest.csv",  header = FALSE)
-yTest_new=read.csv("/Users/rxh655/Documents/Spring2019/STAT557/project1/project1Code/datamining_project_1/ecoli_new.yTest.csv",  header = FALSE)
+xTrain_new=read.csv("ecoli_new.xTrain.csv",  header = FALSE)
+yTrain_new=read.csv("ecoli_new.yTrain.csv",  header = FALSE)
+xTest_new=read.csv("ecoli_new.xTest.csv",  header = FALSE)
+yTest_new=read.csv("ecoli_new.yTest.csv",  header = FALSE)
 
 #### Part 1 ####
 logProd <- function(x){
   
   logProduct=0
   for(i in 1:length(x)){
-    logProduct=logProduct+x[i]
+    if (!is.infinite(x[i]) && !is.nan(x[i])){
+      logProduct=logProduct+x[i]
+    }
   }
   
   return(logProduct)
 }
 
 logSum <- function(x){
-  
-  # use logsum function from https://www.rdocumentation.org/packages/tileHMM/versions/1.0-7/topics/logSum
-  # logSummation=logSum(x,y=null,base=0);
   
   sortedX = sort(x, decreasing = TRUE)
   
@@ -57,31 +57,25 @@ prior <- function(yTrain){
   v<-freq[[2]]
   sumF<- sum(v)
   vec<-v/sumF
-  
   return(vec)
 }
 
 likelihood <- function(xTrain, yTrain){
   combinedMtx<- as.data.frame(cbind(xTrain,yTrain))
-  options(max.print = 999999)
-  M<-aggregate(combinedMtx, combinedMtx[ncol(xTrain)+1], mean)
   
-  M<-M[,2:(ncol(xTrain)+1)]
-  print(c("ncol xtrain ",ncol(xTrain)))
-  V<-aggregate(combinedMtx, combinedMtx[ncol(xTrain)+1], var)
-  #print(c(V) )
-  V<-V[,2:(ncol(xTrain)+1)]
-  #print(print(c(V) ))
+  dims = dim(combinedMtx)
+  nRow = dims[1]
+  nCol = dims[2]
+  
+  M<-aggregate(combinedMtx[,1:(nCol-1)], combinedMtx[nCol], mean)
+  M<-M[,2:nCol]
+  
+  V<-aggregate(combinedMtx[,1:(nCol-1)], combinedMtx[nCol], var)
+  V<-V[,2:nCol]
+  
   M<-data.matrix(M)
   V<-data.matrix(V)
-  #print(dim(M))
-  #print(V)
-  #print(combinedMtx)
-  #print(groupBy(combinedMtx, combinedMtx[,6], mean))
   retList<- list("M" = M, "V" = V)
-  #print("IS MATRIX")
-  #print(is.matrix(retList$M))
-  #print(retList)
   return(retList)
 }
 
@@ -90,7 +84,6 @@ naiveBayesClassify <- function(xTest, M, V, p){
   xTest<-as.matrix(xTest)
   
   classification<-vector()
-  print(c("nrow in xTEST ",nrow(xTest), " length of p ", length(p)))
   for(j in 1:nrow(xTest))
   {
     lglikelihood<-vector()
@@ -101,34 +94,29 @@ naiveBayesClassify <- function(xTest, M, V, p){
       M_i <- as.vector(M[i,])
       V_i <- as.vector(V[i,])
 
-      #print(V_i)
       ################# breaking it up ##############     
-      #V_i <- 1/V_i
-      #print(V_i)
-      #x_j_M_i_diff <- (x_j - M_i) ^ 2 * V_i
-      #p_x_given_y_exp <- x_j_M_i_diff
+      V_i <- 1/V_i
+      x_j_M_i_diff <- (x_j - M_i) ^ 2 * V_i
+      p_x_given_y_exp <- x_j_M_i_diff
+      p_x_given_y_exp = lapply(p_x_given_y_exp, function(x) x[is.finite(x)])
+      p_x_given_y_exp = unlist(p_x_given_y_exp, use.names=FALSE)
       
-      #p_x_given_y_var <- logProd(log(V_i))
-      #p_x_given_y <- (p_x_given_y_var - sum(p_x_given_y_exp))/2
-      #print(p_x_given_y)
-      #p_y_given_x <- p_x_given_y + log(p[i])
-      #print(p_y_given_x)
+      p_x_given_y_var <- logProd(log(V_i))
+      
+      p_x_given_y <- (p_x_given_y_var - sum(p_x_given_y_exp))/2
+      p_y_given_x <- p_x_given_y + log(p[i])
       #################### taking normal distribution function ##############
-      p_x_given_y<-dnorm(x_j,mean = M_i, sd = V_i, log)
+      #p_x_given_y<-dnorm(x_j,mean = M_i, sd = V_i, log)
       #print(c("P(X|Y)", p_x_given_y))
-      p_x_given_y<-c((p_x_given_y), log(p[i]))
+      #p_x_given_y<-c((p_x_given_y), log(p[i]))
       #print(c("logP(X|Y) ", p_x_given_y))
-      p_y_given_x<-logProd(p_x_given_y)
+      #p_y_given_x<-logProd(p_x_given_y)
       #print(c("P(Y|X)", p_y_given_x))
       
       lglikelihood<-(c(lglikelihood, p_y_given_x))
     }
-    #print(lglikelihood)
     classification<-c(classification, which.max(lglikelihood))
   }
-  #print(is.vector(classification))
-  #print(length(classification))
-  #print(classification)
   return(classification)
 }
 
@@ -198,7 +186,6 @@ logisticRegressionClassify <- function(xTest, w){
 }
 
 
-
 #### Part 3 Helper Functions ####
 getInitialWeight <- function(xTrain){
   dims = dim(xTrain)
@@ -236,8 +223,8 @@ getPrecisionAndRecall<-function(X, predictedLabels, goldLabels){
   
   goldTable=table(goldLabels)
   
-  print(predictedTable)
-  print(goldTable)
+  ##print(predictedTable)
+  ##print(goldTable)
   
   totalPredictedX=predictedTable[X]
   
@@ -252,8 +239,8 @@ getPrecisionAndRecall<-function(X, predictedLabels, goldLabels){
   goldLabels <- as.data.frame(goldLabels)
   goldLabels <- as.vector(goldLabels[[1]])
   
-  print(c("predicted ", length(predictedLabels), is.vector(predictedLabels), " gold ", length(goldLabels), is.data.frame(goldLabels), nrow(goldLabels), ncol(goldLabels)))
   for(i in 1:length(predictedLabels)){
+    #print(c(predictedLabels[i], goldLabels[i]))
     if(predictedLabels[i]==goldLabels[i]){
       correctPredictionCount=correctPredictionCount+1;
     }
@@ -281,33 +268,16 @@ getPrecisionAndRecall<-function(X, predictedLabels, goldLabels){
   
   return(c(precision,recall,accuracy) )
 }
-#print(prior(yTrain))
-#likelihood(xTrain,yTrain)
 
-likelhd<-likelihood(xTrain_old, yTrain_old)
-predictions<-naiveBayesClassify(xTest_old, likelhd$M, likelhd$V, prior(yTrain_old))
-
-predictions_new<-naiveBayesClassify(xTest_new, likelihood(xTrain_new, yTrain_new)$M, likelihood(xTrain_new, yTrain_new)$V, prior(yTrain_new))
-freq<-as.data.frame(table(yTrain_new))
-name<-freq[[1]]
-
-print("GGGGGGGGGGG")
-print(predictions)
-is.vector(predictions)
-print("FFFFFFFFF")
-#print(yTest_new)
-
-
-##yTest_new <- as.data.frame(yTest_new)
-#yTest_new <- as.vector(yTest_new[[1]])
-#yTest_old <- as.data.frame(yTest_old)
-#yTest_old <- as.vector(yTest_old[[1]])
-#yTest <- as.data.frame(yTest)
-#yTest <- as.vector(yTest[[1]])
-#is.vector(yTest)
-#is.vector(predictions)
+#################### old dataset with 5 classes ####################
+l_old<-likelihood(xTrain_old, yTrain_old)
+predictions<-naiveBayesClassify(xTest_old, l_old$M, l_old$V, prior(yTrain_old))
 precisionRecall<-getPrecisionAndRecall(1, predictions, goldLabels = yTest_old)
-print(c(precisionRecall[1], "  ", precisionRecall[2], "  ", precisionRecall[3]))
+print(c("Old Dataset: ","Precision = ", precisionRecall[1], "  , Recall = ", precisionRecall[2], "  , Accuracy = ", precisionRecall[3]))
 
-#precisionRecall<-getPrecisionAndRecall(1, predictions_new, goldLabels = yTest_new)
-#print(c(precisionRecall[1], "  ", precisionRecall[2], "  ", precisionRecall[3]))
+#################### new dataset with 2 classes ####################
+l<-likelihood(xTrain_new, yTrain_new)
+predictions_new<-naiveBayesClassify(xTest_new, l$M, l$V, prior(yTrain_new))
+predictions_new<-predictions_new-1
+precisionRecall<-getPrecisionAndRecall(1, predictions_new, goldLabels = yTest_new)
+print(c("New Dataset: ","Precision = ",precisionRecall[1], "  , Recall = ",  precisionRecall[2], "  , Accuracy = ", precisionRecall[3]))
